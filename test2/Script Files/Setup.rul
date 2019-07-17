@@ -1,0 +1,116 @@
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  This template script provides the code necessary to build an entry-point 
+//  function to be called in an InstallScript custom action. 
+//                                                                            
+//                                                                            
+//    File Name:  Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                        
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// Include Ifx.h for built-in InstallScript function prototypes, for Windows 
+// Installer API function prototypes and constants, and to declare code for 
+// the OnBegin and OnEnd events.
+#include "ifx.h"
+
+// The keyword export identifies MyFunction() as an entry-point function.
+// The argument it accepts must be a handle to the Installer database.
+export prototype CA_Progress(HWND);
+
+// To Do:  Declare global variables, define constants, and prototype user-
+//         defined and DLL functions here.
+
+
+// To Do:  Create a custom action for this entry-point function:
+// 1.  Right-click on "Custom Actions" in the Sequences/Actions view.
+// 2.  Select "Custom Action Wizard" from the context menu.
+// 3.  Proceed through the wizard and give the custom action a unique name.
+// 4.  Select "Run InstallScript code" for the custom action type, and in
+//     the next panel select "MyFunction" (or the new name of the entry-
+//     point function) for the source.
+// 5.  Click Next, accepting the default selections until the wizard
+//     creates the custom action.
+//
+// Once you have made a custom action, you must execute it in your setup by
+// inserting it into a sequence or making it the result of a dialog's
+// control event.
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           
+// Function:  MyFunction
+//                                                                           
+//  Purpose:  This function will be called by the script engine when
+//            Windows(TM) Installer executes your custom action (see the "To
+//            Do," above).
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function CA_Progress(hInstall)
+    // To Do:  Declare local variables.
+    NUMBER iResult;
+    HWND hRec, hProgressRec, hTotalRec;
+    NUMBER nvBufferSize;
+    BOOL mode;
+begin
+	mode = MsiGetMode(hInstall, MSIRUNMODE_SCHEDULED);
+	
+	if( mode ) then
+
+		MessageBox("starting CA", INFORMATION);
+
+		hRec = MsiCreateRecord(3);
+		hProgressRec = MsiCreateRecord(3);
+		
+		MessageBox("handles obtained", INFORMATION);
+		
+		MsiRecordSetInteger(hRec, 1, 1);
+		MsiRecordSetInteger(hRec, 2, 1);
+		MsiRecordSetInteger(hRec, 3, 0);
+		iResult = MsiProcessMessage(hInstall, INSTALLMESSAGE_PROGRESS, hRec);
+
+		Delay(2);
+		MessageBox("Process Msg1", INFORMATION);    
+		
+		MsiRecordSetInteger(hProgressRec, 1, 2);
+		MsiRecordSetInteger(hProgressRec, 2, 20);
+		MsiRecordSetInteger(hProgressRec, 3, 0);
+		iResult = MsiProcessMessage(hInstall, INSTALLMESSAGE_PROGRESS, hProgressRec);
+		
+		Delay(2);
+		MessageBox("Process Msg 2", INFORMATION);
+		
+		MsiRecordSetInteger(hProgressRec, 1, 2);
+		MsiRecordSetInteger(hProgressRec, 2, 40);
+		MsiRecordSetInteger(hProgressRec, 3, 0);
+		iResult = MsiProcessMessage(hInstall, INSTALLMESSAGE_PROGRESS, hProgressRec);
+		
+		Delay(2);
+		MessageBox("Process Msg 3", INFORMATION);
+		
+		MsiRecordSetInteger(hProgressRec, 1, 2);
+		MsiRecordSetInteger(hProgressRec, 2, 20);
+		MsiRecordSetInteger(hProgressRec, 3, 0);
+		iResult = MsiProcessMessage(hInstall, INSTALLMESSAGE_PROGRESS, hProgressRec);
+		
+		Delay(2);
+		MessageBox("Process Msg 4", INFORMATION);
+		
+		MsiCloseHandle(hRec);
+		MsiCloseHandle(hProgressRec);
+
+		MessageBox("released handles", INFORMATION);
+	
+	else
+			
+		//set the total to 100%
+		MessageBox("setting total ticks...", INFORMATION);
+		
+		hTotalRec = MsiCreateRecord(2);
+		MsiRecordSetInteger(hTotalRec, 1, 3);
+		MsiRecordSetInteger(hTotalRec, 2, 100);
+		iResult = MsiProcessMessage(hInstall, INSTALLMESSAGE_PROGRESS, hTotalRec);
+
+		MessageBox("total ticks set", INFORMATION);
+	endif;
+end;
